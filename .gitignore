@@ -1,0 +1,19 @@
+# Agent Data
+.gemini/
+brain/
+scratch/
+
+# Python
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+
+# Tableau
+*.twb.bak
+*.tbm
+
+# OS
+.DS_Store
+Thumbs.db

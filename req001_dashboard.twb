@@ -1,0 +1,282 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<workbook source-build='2023.1.0 (20231.23.0511.1508)' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <_.fcp.AnimationOnByDefault.true...AnimationOnByDefault />
+    <_.fcp.MarkAnimation.true...MarkAnimation />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.clear.color.palette' value='true' />
+  </preferences>
+  <datasources>
+    <datasource caption='Teen_Mental_Health_Dataset' inline='true' name='federated.12345' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='Teen_Mental_Health_Dataset' name='textscan.12345'>
+            <connection class='textscan' directory='documents' filename='Teen_Mental_Health_Dataset.csv' separator=',' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.12345' name='Teen_Mental_Health_Dataset.csv' table='[Teen_Mental_Health_Dataset#csv]' type='table'>
+          <columns>
+            <column datatype='integer' name='age' ordinal='0' />
+            <column datatype='string' name='gender' ordinal='1' />
+            <column datatype='real' name='daily_social_media_hours' ordinal='2' />
+            <column datatype='string' name='platform_usage' ordinal='3' />
+            <column datatype='real' name='sleep_hours' ordinal='4' />
+            <column datatype='real' name='screen_time_before_sleep' ordinal='5' />
+            <column datatype='real' name='academic_performance' ordinal='6' />
+            <column datatype='real' name='physical_activity' ordinal='7' />
+            <column datatype='string' name='social_interaction_level' ordinal='8' />
+            <column datatype='integer' name='stress_level' ordinal='9' />
+            <column datatype='integer' name='anxiety_level' ordinal='10' />
+            <column datatype='integer' name='addiction_level' ordinal='11' />
+            <column datatype='integer' name='depression_label' ordinal='12' />
+          </columns>
+        </relation>
+      </connection>
+      <column caption='Risk_Score' datatype='integer' name='[Calculation_Risk_Score]' role='measure' type='quantitative'>
+        <calculation class='tableau' formula='IIF([stress_level] &gt;= 7, 1, 0) + IIF([sleep_hours] &lt; 6, 1, 0) + IIF([daily_social_media_hours] &gt;= 6, 1, 0)' />
+      </column>
+      <column caption='Risk_Category' datatype='string' name='[Calculation_Risk_Category]' role='dimension' type='nominal'>
+        <calculation class='tableau' formula='IF [Calculation_Risk_Score] &gt;= 2 THEN &quot;High Risk&quot; ELSEIF [Calculation_Risk_Score] = 1 THEN &quot;Medium Risk&quot; ELSE &quot;Low Risk&quot; END' />
+      </column>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Risk Distribution by Gender'>
+      <table>
+        <view>
+          <datasources>
+            <datasource name='federated.12345' />
+          </datasources>
+          <datasource-dependencies datasource='federated.12345'>
+            <column datatype='string' name='[gender]' role='dimension' type='nominal' />
+            <column caption='Risk_Category' datatype='string' name='[Calculation_Risk_Category]' role='dimension' type='nominal' />
+            <column-instance column='[Calculation_Risk_Category]' derivation='None' name='[none:Calculation_Risk_Category:nk]' pivot='key' type='nominal' />
+            <column-instance column='[gender]' derivation='None' name='[none:gender:nk]' pivot='key' type='nominal' />
+            <column-instance column='[gender]' derivation='Count' name='[cnt:gender:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.12345].[none:Calculation_Risk_Category:nk]' type='palette'>
+              <map to='#e15759'>
+                <bucket>&quot;High Risk&quot;</bucket>
+              </map>
+              <map to='#f28e2b'>
+                <bucket>&quot;Medium Risk&quot;</bucket>
+              </map>
+              <map to='#59a14f'>
+                <bucket>&quot;Low Risk&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.12345].[none:Calculation_Risk_Category:nk]' />
+              <text column='[federated.12345].[cnt:gender:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.12345].[cnt:gender:qk]</rows>
+        <cols>[federated.12345].[none:gender:nk]</cols>
+      </table>
+      <simple-id uuid='{11111111-1111-1111-1111-111111111111}' />
+    </worksheet>
+    <worksheet name='Sleep vs. Anxiety'>
+      <table>
+        <view>
+          <datasources>
+            <datasource name='federated.12345' />
+          </datasources>
+          <datasource-dependencies datasource='federated.12345'>
+            <column datatype='real' name='[sleep_hours]' role='measure' type='quantitative' />
+            <column datatype='integer' name='[anxiety_level]' role='dimension' type='ordinal' />
+            <column-instance column='[sleep_hours]' derivation='Avg' name='[avg:sleep_hours:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[anxiety_level]' derivation='None' name='[none:anxiety_level:ok]' pivot='key' type='ordinal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <text column='[federated.12345].[avg:sleep_hours:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.12345].[avg:sleep_hours:qk]</rows>
+        <cols>[federated.12345].[none:anxiety_level:ok]</cols>
+      </table>
+      <simple-id uuid='{22222222-2222-2222-2222-222222222222}' />
+    </worksheet>
+    <worksheet name='Screen Time Impact'>
+      <table>
+        <view>
+          <datasources>
+            <datasource name='federated.12345' />
+          </datasources>
+          <datasource-dependencies datasource='federated.12345'>
+            <column datatype='real' name='[daily_social_media_hours]' role='measure' type='quantitative' />
+            <column caption='Risk_Category' datatype='string' name='[Calculation_Risk_Category]' role='dimension' type='nominal' />
+            <column-instance column='[daily_social_media_hours]' derivation='Avg' name='[avg:daily_social_media_hours:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Calculation_Risk_Category]' derivation='None' name='[none:Calculation_Risk_Category:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.12345].[none:Calculation_Risk_Category:nk]' type='palette'>
+              <map to='#e15759'>
+                <bucket>&quot;High Risk&quot;</bucket>
+              </map>
+              <map to='#f28e2b'>
+                <bucket>&quot;Medium Risk&quot;</bucket>
+              </map>
+              <map to='#59a14f'>
+                <bucket>&quot;Low Risk&quot;</bucket>
+              </map>
+            </encoding>
+          </style-rule>
+        </style>
+        <panes>
+          <pane>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Bar' />
+            <encodings>
+              <color column='[federated.12345].[none:Calculation_Risk_Category:nk]' />
+              <text column='[federated.12345].[avg:daily_social_media_hours:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='mark-labels-show' value='true' />
+                <format attr='mark-labels-cull' value='true' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.12345].[none:Calculation_Risk_Category:nk]</rows>
+        <cols>[federated.12345].[avg:daily_social_media_hours:qk]</cols>
+      </table>
+      <simple-id uuid='{33333333-3333-3333-3333-333333333333}' />
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard name='Mental Wellness Dashboard'>
+      <style />
+      <size maxheight='800' maxwidth='1000' minheight='800' minwidth='1000' />
+      <datasources>
+        <datasource name='federated.12345' />
+      </datasources>
+      <zones>
+        <zone h='100000' id='1' type='layout-basic' w='100000' x='0' y='0'>
+          <zone h='33333' id='2' name='Risk Distribution by Gender' type-v2='worksheet' w='100000' x='0' y='0' />
+          <zone h='33333' id='3' name='Sleep vs. Anxiety' type-v2='worksheet' w='100000' x='0' y='33333' />
+          <zone h='33334' id='4' name='Screen Time Impact' type-v2='worksheet' w='100000' x='0' y='66666' />
+        </zone>
+      </zones>
+      <devicelayouts>
+        <devicelayout name='Phone'>
+          <size maxheight='700' minheight='700' sizing-mode='vscroll' />
+          <zones>
+            <zone h='100000' id='5' type='layout-basic' w='100000' x='0' y='0' />
+          </zones>
+        </devicelayout>
+      </devicelayouts>
+      <simple-id uuid='{44444444-4444-4444-4444-444444444444}' />
+    </dashboard>
+  </dashboards>
+  <windows>
+    <window class='worksheet' maximized='true' name='Risk Distribution by Gender'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+        </edge>
+      </cards>
+    </window>
+    <window class='worksheet' name='Sleep vs. Anxiety'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+        </edge>
+      </cards>
+    </window>
+    <window class='worksheet' name='Screen Time Impact'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+        </edge>
+      </cards>
+    </window>
+    <window class='dashboard' name='Mental Wellness Dashboard'>
+      <viewpoints>
+        <viewpoint name='Risk Distribution by Gender' />
+        <viewpoint name='Sleep vs. Anxiety' />
+        <viewpoint name='Screen Time Impact' />
+      </viewpoints>
+      <active id='-1' />
+    </window>
+  </windows>
+</workbook>
